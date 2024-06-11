@@ -53,9 +53,7 @@
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="{{ route('booking') }}">Booking</a></li>
-          <li><a href="services.html">Jadwal Lapangan</a></li>
-          <li><a href="projects.html">Daftar member</a></li>
-          <li><a href="blog.html">Kontak Admin</a></li>
+          <li><a href="https://wa.me/6282111342943" target = "_blank">Kontak Admin</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -71,88 +69,88 @@
       <div class="row gy-4">
         <div class="col-lg-4 col-md-6 footer-about">
           <a href="index.html" class="logo d-flex align-items-center">
-            <span class="sitename">Gor Haji Ridho</span>
+            <span class="sitename">GOR Haji Ridho</span>
           </a>
           <div class="footer-contact pt-3">
-            <p>A108 Adam Street</p>
-            <p>New York, NY 535022</p>
-            <p class="mt-3"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
-            <p><strong>Email:</strong> <span>info@example.com</span></p>
+            <p>Jl. Gegerkalong Tengah, Sukasari</p>
+            <p>Bandung, Jawa Barat 40153</p>
+            <p class="mt-3"><strong>Telepon:</strong> <span>+62 22 1234567</span></p>
+            <p><strong>Email:</strong> <span>info@gorhajiridho.com</span></p>
           </div>
           <div class="social-links d-flex mt-4">
-            <a href=""><i class="bi bi-twitter-x"></i></a>
-            <a href=""><i class="bi bi-facebook"></i></a>
-            <a href=""><i class="bi bi-instagram"></i></a>
-            <a href=""><i class="bi bi-linkedin"></i></a>
+            <a href="https://twitter.com"><i class="bi bi-twitter"></i></a>
+            <a href="https://facebook.com"><i class="bi bi-facebook"></i></a>
+            <a href="https://instagram.com"><i class="bi bi-instagram"></i></a>
+            <a href="https://linkedin.com"><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
-
+  
         <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Useful Links</h4>
+          <h4>Tautan Berguna</h4>
           <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">About us</a></li>
-            <li><a href="#">Services</a></li>
-            <li><a href="#">Terms of service</a></li>
-            <li><a href="#">Privacy policy</a></li>
+            <li><a href="#">Beranda</a></li>
+            <li><a href="#">Tentang Kami</a></li>
+            <li><a href="#">Layanan</a></li>
+            <li><a href="#">Syarat & Ketentuan</a></li>
+            <li><a href="#">Kebijakan Privasi</a></li>
           </ul>
         </div>
-
+  
         <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Our Services</h4>
+          <h4>Layanan Kami</h4>
           <ul>
-            <li><a href="#">Web Design</a></li>
-            <li><a href="#">Web Development</a></li>
-            <li><a href="#">Product Management</a></li>
-            <li><a href="#">Marketing</a></li>
-            <li><a href="#">Graphic Design</a></li>
+            <li><a href="#">Penyewaan Lapangan</a></li>
+            <li><a href="#">Perlengkapan Badminton</a></li>
+            <li><a href="#">Pelatihan dan Kursus</a></li>
+            <li><a href="#">Turnamen dan Kompetisi</a></li>
+            <li><a href="#">Reservasi Online</a></li>
           </ul>
         </div>
-
+  
         <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Hic solutasetp</h4>
+          <h4>Info Terbaru</h4>
           <ul>
-            <li><a href="#">Molestiae accusamus iure</a></li>
-            <li><a href="#">Excepturi dignissimos</a></li>
-            <li><a href="#">Suscipit distinctio</a></li>
-            <li><a href="#">Dilecta</a></li>
-            <li><a href="#">Sit quas consectetur</a></li>
+            <li><a href="#">Berita & Acara</a></li>
+            <li><a href="#">Promo Spesial</a></li>
+            <li><a href="#">Testimoni Pelanggan</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Karir</a></li>
           </ul>
         </div>
-
+  
         <div class="col-lg-2 col-md-3 footer-links">
-          <h4>Nobis illum</h4>
+          <h4>Hubungi Kami</h4>
           <ul>
-            <li><a href="#">Ipsam</a></li>
-            <li><a href="#">Laudantium dolorum</a></li>
-            <li><a href="#">Dinera</a></li>
-            <li><a href="#">Trodelas</a></li>
-            <li><a href="#">Flexo</a></li>
+            <li><a href="#">Kontak</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Peta Lokasi</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Feedback</a></li>
           </ul>
         </div>
-
+  
       </div>
     </div>
-
+  
     <div class="container copyright text-center mt-4">
-      <p>© <span>Copyright</span> <strong class="px-1 sitename">UpConstruction</strong> <span>All Rights Reserved</span></p>
+      <p>© <span>Hak Cipta</span> <strong class="px-1 sitename">GOR Haji Ridho</strong> <span>Semua Hak Dilindungi</span></p>
       <div class="credits">
-        <!-- All the links in the footer should remain intact. -->
-        <!-- You can delete the links only if you've purchased the pro version. -->
-        <!-- Licensing information: https://bootstrapmade.com/license/ -->
-        <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        <!-- Semua tautan di footer harus tetap utuh. -->
+        <!-- Anda bisa menghapus tautan hanya jika Anda telah membeli versi pro. -->
+        <!-- Informasi lisensi: https://bootstrapmade.com/license/ -->
+        <!-- Beli versi pro dengan formulir kontak PHP/AJAX yang berfungsi: [buy-url] -->
+        Dirancang oleh <a href="https://bootstrapmade.com/">BootstrapMade</a>
       </div>
     </div>
-
+  
   </footer>
-
+  
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
+  
   <!-- Preloader -->
   <div id="preloader"></div>
-
+  
   <!-- Vendor JS Files -->
   <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ asset('assets/vendor/php-email-form/validate.js') }}"></script>
@@ -163,10 +161,10 @@
   <script src="{{ asset('assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
   <script src="{{ asset('assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
   
-
   <!-- Main JS File -->
   <script src="{{ asset('assets/js/main.js') }}"></script>
-
-</body>
-
-</html>
+  
+  </body>
+  
+  </html>
+  

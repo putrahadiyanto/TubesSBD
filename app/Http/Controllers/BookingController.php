@@ -73,9 +73,10 @@ class BookingController extends Controller
 
     public function index(){
         $bookings = DB::select('
-            SELECT bookings.*, events.nama_event AS event_name
+            SELECT bookings.*, events.nama_event AS event_name, peminjam.*
             FROM bookings
-            LEFT JOIN events ON bookings.id_event = events.id');
+            LEFT JOIN events ON bookings.id_event = events.id
+            LEFT JOIN peminjam ON bookings.id_peminjam = peminjam.id_peminjam');
     
         return view('admin.booking.index', compact('bookings'));
     }
@@ -135,8 +136,24 @@ class BookingController extends Controller
         $jam_mulai = $request->jam_mulai;
         $jam_selesai = $request->jam_selesai;
         $total_price = $request->total_price;
-    
-        // Perform SQL insertion for bookings table using classic SQL query
+
+        // Call the MySQL function to check for schedule conflicts
+        $conflict_count = DB::select("
+            SELECT checkScheduleConflict(?, ?, ?) AS conflict_count
+        ", [
+            $tanggal_booking,
+            $jam_mulai,
+            $jam_selesai,
+        ]);
+
+        // Check the result of the conflict check
+        if ($conflict_count[0]->conflict_count > 0) {
+            // Conflict found, redirect back to the create booking page with an error message and pass id_peminjam
+            return redirect()->route('bookingstore', ['id_peminjam' => $id_peminjam])
+                ->with('error', 'The selected time slot overlaps with a member\'s schedule. Please choose a different time.');
+        }
+
+        // No conflicts, proceed with booking insertion
         DB::insert("
             INSERT INTO bookings (id_peminjam, tanggal_booking, jam_mulai, jam_selesai, total, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, NOW(), NOW())
@@ -147,16 +164,14 @@ class BookingController extends Controller
             $jam_selesai,
             $total_price,
         ]);
-    
+
         // Get the ID of the newly created booking
         $result = DB::select("SELECT LAST_INSERT_ID() AS id");
         $bookingId = $result[0]->id;
-    
-        // Redirect back to the event page with the ID of the newly created booking
+
+        // Redirect to the equipment creation page with the ID of the newly created booking
         return redirect()->route('createEquipment', ['id' => $bookingId])->with('success', 'Booking created successfully.');
     }
-    
-   
    
    public function show($id)
    {
@@ -170,9 +185,11 @@ class BookingController extends Controller
        return view('booking.show', ['booking' => $booking[0]]);
    }
 
-   public function edit($id)
+    public function edit($id)
     {
-        $booking = DB::select('SELECT * FROM bookings WHERE id = ?', [$id]);
+        $booking = DB::select('SELECT bookings.*, peminjam.* FROM bookings
+                INNER JOIN peminjam ON bookings.id_peminjam = peminjam.id_peminjam
+                WHERE id = ?', [$id]);
 
         if (empty($booking)) {
             return redirect()->route('booking.index')->with('error', 'Booking not found.');

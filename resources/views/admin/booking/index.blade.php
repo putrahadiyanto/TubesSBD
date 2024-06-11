@@ -10,6 +10,7 @@
                     <th>ID</th>
                     <th>Nama Peminjam</th>
                     <th>No Telepon</th>
+                    <th>Email</th>
                     <th>Tanggal Booking</th>
                     <th>Jam Mulai</th>
                     <th>Jam Selesai</th>
@@ -25,7 +26,8 @@
                     <tr>
                         <td>{{ $booking->id }}</td>
                         <td>{{ $booking->nama_peminjam }}</td>
-                        <td>{{ $booking->no_telepon }}</td>
+                        <td>{{ $booking->nomor_telepon_peminjam }}</td>
+                        <td>{{ $booking->email_peminjam }}</td>
                         <td>{{ $booking->tanggal_booking }}</td>
                         <td>{{ $booking->jam_mulai }}</td>
                         <td>{{ $booking->jam_selesai }}</td>

@@ -12,22 +12,39 @@
       </nav>
     </div>
 </div><!-- End Page Title -->
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">Booking</div>
                 <div class="card-body">
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{route('store.booking')}}" id="bookingForm">
                         @csrf
                         
                         <div class="form-group">
-                            <input type="hidden" name="id_peminjam" class="form-control" value="{{ $id_peminjam }}" readonly>
+                            <input type="hidden" name="id_peminjam" class="form-control" value="{{ old('id_peminjam', $id_peminjam) }}" readonly>
                         </div>
                         
                         <div class="form-group">
                             <label for="tanggal_booking">Tanggal Booking</label>
-                            <input type="date" name="tanggal_booking" class="form-control" required>
+                            <input type="date" name="tanggal_booking" class="form-control" value="{{ old('tanggal_booking') }}" required>
                         </div>
 
                         <div class="form-group">
@@ -38,7 +55,7 @@
                                         @php
                                             $time = sprintf('%02d', $i) . ':' . sprintf('%02d', $j);
                                         @endphp
-                                        <option value="{{ $time }}">{{ $time }}</option>
+                                        <option value="{{ $time }}" {{ old('jam_mulai') == $time ? 'selected' : '' }}>{{ $time }}</option>
                                     @endfor
                                 @endfor
                             </select>
@@ -52,15 +69,15 @@
                                         @php
                                             $time = sprintf('%02d', $i) . ':' . sprintf('%02d', $j);
                                         @endphp
-                                        <option value="{{ $time }}">{{ $time }}</option>
+                                        <option value="{{ $time }}" {{ old('jam_selesai') == $time ? 'selected' : '' }}>{{ $time }}</option>
                                     @endfor
                                 @endfor
                             </select>
-                        </div>                       
+                        </div>
 
                         <div class="form-group">
                             <label for="total_price">Total Price</label>
-                            <input type="text" name="total_price" id="total_price" class="form-control" readonly>
+                            <input type="text" name="total_price" id="total_price" class="form-control" value="{{ old('total_price') }}" readonly>
                         </div>
 
                         <div class="form-group">
@@ -101,6 +118,11 @@
             document.getElementById('total_price').value = totalPrice.toFixed(2);
             submitButton.disabled = false;
         }
+    }
+
+    // Calculate price on page load if values are set
+    if (document.getElementById('jam_mulai').value && document.getElementById('jam_selesai').value) {
+        calculatePrice();
     }
 </script>
 

@@ -11,7 +11,7 @@
         </div>
         <div class="form-group">
             <label for="no_telepon">No Telepon:</label>
-            <input type="text" name="no_telepon" class="form-control" value="{{ $booking->no_telepon }}" required>
+            <input type="text" name="no_telepon" class="form-control" value="{{ $booking->nomor_telepon_peminjam }}" required>
         </div>
         <div class="form-group">
             <label for="tanggal_booking">Tanggal Booking:</label>

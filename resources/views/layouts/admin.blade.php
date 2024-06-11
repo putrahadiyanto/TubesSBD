@@ -20,6 +20,7 @@
                 <li class="nav-item"><a class="nav-link" href="{{ route('equipment.index') }}">Equipments</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('event.index') }}">Events</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ route('member.index') }}">Members</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('booking.index') }}">Booking</a></li>
             </ul>
         </div>
     </nav>

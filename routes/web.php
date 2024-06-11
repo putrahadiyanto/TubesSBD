@@ -36,6 +36,7 @@ Route::get('/dashboard', function(){
 Route::resource('/admin/event', EventController::class);
 Route::resource('/admin/member', MemberController::class);
 Route::resource('/admin/equipment', EquipmentController::class);
+Route::resource('/admin/booking', BookingController::class);
 
 Route::get('/admin', function(){
     return view('admin.dashboard');

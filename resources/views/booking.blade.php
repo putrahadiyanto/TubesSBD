@@ -20,17 +20,11 @@
                 <div class="card-body">
                     <form method="POST" action="{{route('store.booking')}}" id="bookingForm">
                         @csrf
-
+                        
                         <div class="form-group">
-                            <label for="nama_peminjam">Nama Peminjam</label>
-                            <input type="text" name="nama_peminjam" class="form-control" required>
+                            <input type="hidden" name="id_peminjam" class="form-control" value="{{ $id_peminjam }}" readonly>
                         </div>
-
-                        <div class="form-group">
-                            <label for="no_telepon">Nomor Telepon</label>
-                            <input type="text" name="no_telepon" class="form-control" required>
-                        </div>
-
+                        
                         <div class="form-group">
                             <label for="tanggal_booking">Tanggal Booking</label>
                             <input type="date" name="tanggal_booking" class="form-control" required>
@@ -62,7 +56,7 @@
                                     @endfor
                                 @endfor
                             </select>
-                        </div>
+                        </div>                       
 
                         <div class="form-group">
                             <label for="total_price">Total Price</label>
@@ -72,7 +66,7 @@
                         <div class="form-group">
                             <p id="error_message" style="color:red; display:none;">Jam Mulai harus lebih awal dari Jam Selesai</p>
                         </div>
-                        
+
                         <div class="form-group">
                             <button type="submit" id="submit_button" class="btn btn-primary mt-3">Submit</button>
                         </div>

@@ -22,11 +22,15 @@ Route::get('/', function () {
     return view('index');
 })->name('home');
 
-Route::get('/booking', [BookingController::class, 'create'])->name('booking');
-
+Route::get('/booking', [BookingController::class, 'enterEmail'])->name('booking');
+Route::post('/booking/email', [BookingController::class, 'processEmail'])->name('email');
+Route::get('/booking/enter-phone', [BookingController::class, 'enterPhone'])->name('enterPhone');
+Route::post('/booking/telepon', [BookingController::class, 'processPhone'])->name('telepon');
+Route::get('/booking/data/{id_peminjam}', [BookingController::class, 'create'])->name('bookingstore');
 Route::post('/booking/store', [BookingController::class, 'store'])->name('store.booking');
 Route::get('/event/summary/{id}', [BookingController::class,'summary'])->name('event');
-
+Route::get('/booking/{id}/equipment', [BookingController::class, 'createEquipment'])->name('createEquipment');
+Route::post('/booking/{id}/equipment/store', [BookingController::class, 'storeEquipment'])->name('storeEquipment');
 
 Route::get('/dashboard', function(){
     return('admin.dashboard');

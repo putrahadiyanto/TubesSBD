@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_peminjam');
-            $table->string('no_telepon');
+            $table->unsignedBigInteger('id_peminjam')->nullable();
             $table->date('tanggal_booking'); 
             $table->time('jam_mulai');
             $table->time('jam_selesai');
@@ -25,8 +24,9 @@ return new class extends Migration
 
             $table->timestamps();
 
-            
+            // Foreign key constraints
             $table->foreign('id_event')->references('id')->on('events')->onDelete('set null');
+            $table->foreign('id_peminjam')->references('id_peminjam')->on('peminjam')->onDelete('set null');
         });
     }
 

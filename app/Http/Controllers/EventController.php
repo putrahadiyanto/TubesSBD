@@ -26,7 +26,7 @@ class EventController extends Controller
         $events = DB::select('SELECT * FROM events');
 
         // Pass events data to the view
-        return view('booking', compact('events'));
+        return view('admin.event.create', compact('events'));
     }
 
     /**
@@ -116,35 +116,49 @@ class EventController extends Controller
     }
 
     public function summary($id)
-    {
-        $booking = DB::table('bookings')->find($id);
-    
-        if (!$booking) {
-            return redirect()->route('booking.book')->with('error', 'Booking not found.');
-        }
-    
-        // Lakukan pengolahan untuk mendapatkan informasi event, diskon, dan total harga setelah diskon
-        // Anda bisa mendapatkan informasi event berdasarkan tanggal booking atau event tertentu yang terkait dengan booking
-    
-        // Misalnya:
-        $event = DB::table('events')->where('hari_event', Carbon::parse($booking->tanggal_booking)->format('l'))->first();
-    
-        if (!$event) {
-            return redirect()->route('booking')->with('error', 'Event not found.');
-        }
-    
-        // Hitung total harga setelah diskon
-        $discountedTotal = $booking->total - ($booking->total * $event->diskon / 100);
+{
+    $booking = DB::table('bookings')->find($id);
 
-        $booking->total = $discountedTotal;
-    
-        return view('event', [
-            'booking' => $booking,
-            'event' => $event,
-            'discounted_total' => $discountedTotal,
-        ]);
+    if (!$booking) {
+        return redirect()->route('booking.book')->with('error', 'Booking not found.');
     }
-    
-    
 
+    // Ambil informasi event berdasarkan tanggal booking
+    $event = DB::table('events')->where('hari_event', Carbon::parse($booking->tanggal_booking)->format('l'))->first();
+
+    if (!$event) {
+        return redirect()->route('booking')->with('error', 'Event not found.');
+    }
+
+    // Hitung total harga setelah diskon
+    $discountedTotal = $booking->total - ($booking->total * $event->diskon / 100);
+
+    // Ambil data peralatan dan jumlah dari tabel transaksi_equipment
+    $transaksi_equipment = DB::table('transaksi_equipment')
+        ->join('equipments', 'transaksi_equipment.id_equipment', '=', 'equipments.id')
+        ->where('transaksi_equipment.id_booking', $id)
+        ->select('equipments.harga', 'transaksi_equipment.jumlah')
+        ->get();
+
+    // Hitung total harga peralatan
+    $totalHargaEquipment = $transaksi_equipment->sum(function ($equipment) {
+        return $equipment->harga * $equipment->jumlah;
+    });
+
+    // Hitung total akhir
+    $totalAkhir = $discountedTotal + $totalHargaEquipment;
+
+    // Pass data ke view
+    return view('event', [
+        'booking' => $booking,
+        'event' => $event,
+        'discounted_total' => $discountedTotal,
+        'transaksi_equipment' => $transaksi_equipment,
+        'total_harga_equipment' => $totalHargaEquipment,
+        'total_akhir' => $totalAkhir,
+    ]);
+}
+
+
+    
 }

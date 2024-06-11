@@ -9,13 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('equipments', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_equipment');
-            $table->integer('stok');
-            $table->integer('harga');
+        Schema::create('peminjam', function (Blueprint $table) {
+            $table->id('id_peminjam');
+            $table->string('nama_peminjam');
+            $table->string('email_peminjam')->unique();
+            $table->string('nomor_telepon_peminjam')->nullable(); // Kolom nomor telepon baru
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('equipments');
+        Schema::dropIfExists('peminjam');
     }
 };

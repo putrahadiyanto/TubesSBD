@@ -21,6 +21,15 @@
                     <h3>{{ $booking->nama_event }}</h3>
                     <p>{{ $booking->deskripsi_event }}</p>
                     <p>Diskon: {{ $booking->diskon }}%</p>
+                    @if(isset($transaksi_equipment))
+                        @php
+                            $totalHargaEquipment = 0;
+                            foreach($transaksi_equipment as $item) {
+                                $totalHargaEquipment += $item->total;
+                            }
+                        @endphp
+                        <p>Total Harga Tambahan: Rp {{ number_format($totalHargaEquipment, 2) }}</p>
+                    @endif
                     <p>Total Harga: Rp {{ number_format($booking->total, 2) }}</p>
                     <a href="{{ route('home') }}" class="btn btn-primary">Bayar</a>
                 </div>

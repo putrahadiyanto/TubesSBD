@@ -11,6 +11,66 @@ use App\Http\Controllers\EventController;
 class BookingController extends Controller
 {
 
+    public function enteremail()
+    {
+        return view('email');
+    }
+
+    public function processEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        // Periksa apakah email ada dalam tabel peminjam menggunakan fungsi cekEmailPeminjam
+        $email = $request->email;
+        $emailExists = DB::selectOne('SELECT cekEmailPeminjam(?) AS emailExists', [$email]);
+
+        if ($emailExists->emailExists == 0) {
+            // Jika email ditemukan, simpan email di sesi dan arahkan ke halaman memasukkan nomor telepon
+            $request->session()->put('email', $email);
+            return redirect()->route('enterPhone');
+        } else {
+            // Jika email tidak ditemukan, cari id email dan kembalikan dengan pesan kesalahan
+            $emailId = DB::selectOne('SELECT id_peminjam FROM peminjam WHERE email_peminjam = ?', [$email]);
+
+            // Check if emailId is not null before accessing its property
+            // Pass the email id with the error message
+            return redirect()->route('bookingstore', ['id_peminjam' => $emailId->id_peminjam])->with('error', 'Email not found in our records.');
+        }
+    }
+ 
+
+
+    public function enterPhone()
+    {
+        return view('telepon');
+    }
+
+    public function processPhone(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required',
+        ]);
+
+        $email = $request->session()->get('email');
+
+        // Execute the SQL INSERT query using Laravel's database facade
+        DB::insert("INSERT INTO peminjam (email_peminjam, nama_peminjam, nomor_telepon_peminjam) VALUES (?, ?, ?)", [
+            $email,
+            $request->name,
+            $request->phone,
+        ]);
+
+        // Execute a separate SQL query to fetch the last inserted ID
+        $result = DB::select("SELECT LAST_INSERT_ID() AS id");
+        $peminjamId = $result[0]->id;
+
+        // Redirect to the next page with the success message and the ID of the newly inserted peminjam
+        return redirect()->route('bookingstore', ['id_peminjam' => $peminjamId])->with('success', 'Peminjam added successfully.');
+    }
+
     public function index(){
         $bookings = DB::select('
             SELECT bookings.*, events.nama_event AS event_name
@@ -21,70 +81,82 @@ class BookingController extends Controller
     }
     
 
-    public function create()
+    public function create($id_peminjam)
     {
-        
-        $events = DB::select('SELECT * FROM events');
-        
-        return view('booking', compact('events'));
+        return view('booking', compact('id_peminjam'));
     }
+
 
    public function book(){
         $bookings = DB::select('SELECT * FROM bookings');
         return view('booking', compact('bookings'));
    }
 
-
-   public function store(Request $request)
+    public function createEquipment($bookingId){
+        $equipments = DB::select('SELECT * FROM equipments');
+        return view('equipment', compact('equipments', 'bookingId'));
+    }
+    
+    public function storeEquipment(Request $request)
     {
-        // Extract form data
-        $nama_peminjam = $request->nama_peminjam;
-        $no_telepon = $request->no_telepon;
+        $bookingId = $request->booking_id; // Retrieve the booking_id from the request
+
+        if ($request->has('tambahanCheckbox')) {
+            $equipmentId = $request->equipment_id;
+            $jumlahEquipment = $request->quantity;
+            
+            // Fetch the equipment details from the database
+            $equipment = DB::selectOne("SELECT * FROM equipments WHERE id = ?", [$equipmentId]);
+            
+            // Calculate the total price based on quantity and equipment price
+            $total = $jumlahEquipment * $equipment->harga;
+            
+            // Insert the data into the equipments table
+            DB::insert("INSERT INTO transaksi_equipment (booking_id, equipment_id, jumlah_equipment, total, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())
+            ", [
+                $bookingId,
+                $equipmentId,
+                $jumlahEquipment,
+                $total,
+            ]);
+
+            return redirect()->route('event', ['id' => $bookingId])->with('success', 'Equipment added successfully.');
+        } else {
+            // If no additional equipment is selected, redirect back to the event page
+            return redirect()->route('event', ['id' => $bookingId]);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        // Extract data from the request
+        $id_peminjam = $request->id_peminjam;
         $tanggal_booking = $request->tanggal_booking;
         $jam_mulai = $request->jam_mulai;
         $jam_selesai = $request->jam_selesai;
-        $total = $request->total_price;
-
-        // Get the day of the week for the booking date
-        $dayOfWeek = Carbon::parse($tanggal_booking)->format('l');
-
-        // Check for conflicts with members' reserved times
-        $conflict = DB::table('members')
-            ->where('hari', $dayOfWeek)
-            ->where(function($query) use ($jam_mulai, $jam_selesai) {
-                $query->where(function($query) use ($jam_mulai, $jam_selesai) {
-                    $query->where('jam_mulai', '<=', $jam_mulai)
-                        ->where('jam_selesai', '>', $jam_mulai);
-                })->orWhere(function($query) use ($jam_mulai, $jam_selesai) {
-                    $query->where('jam_mulai', '<', $jam_selesai)
-                        ->where('jam_selesai', '>=', $jam_selesai);
-                })->orWhere(function($query) use ($jam_mulai, $jam_selesai) {
-                    $query->where('jam_mulai', '>=', $jam_mulai)
-                        ->where('jam_selesai', '<=', $jam_selesai);
-                });
-            })
-            ->exists();
-
-        if ($conflict) {
-            return back()->withErrors(['error' => 'The selected time slot is already reserved by a member.']);
-        }
-
-        // Perform SQL insertion
-        $bookingId = DB::table('bookings')->insertGetId([
-            'nama_peminjam' => $nama_peminjam,
-            'no_telepon' => $no_telepon,
-            'tanggal_booking' => $tanggal_booking,
-            'jam_mulai' => $jam_mulai,
-            'jam_selesai' => $jam_selesai,
-            'total' => $total,
-            'created_at' => now(),
-            'updated_at' => now(),
+        $total_price = $request->total_price;
+    
+        // Perform SQL insertion for bookings table using classic SQL query
+        DB::insert("
+            INSERT INTO bookings (id_peminjam, tanggal_booking, jam_mulai, jam_selesai, total, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+        ", [
+            $id_peminjam,
+            $tanggal_booking,
+            $jam_mulai,
+            $jam_selesai,
+            $total_price,
         ]);
-
-        // Redirect back with success message
-        return redirect()->route('event', ['id' => $bookingId])->with('success', 'Booking has been created successfully!');
+    
+        // Get the ID of the newly created booking
+        $result = DB::select("SELECT LAST_INSERT_ID() AS id");
+        $bookingId = $result[0]->id;
+    
+        // Redirect back to the event page with the ID of the newly created booking
+        return redirect()->route('createEquipment', ['id' => $bookingId])->with('success', 'Booking created successfully.');
     }
-
+    
+   
    
    public function show($id)
    {
@@ -114,7 +186,7 @@ class BookingController extends Controller
 
         DB::update('UPDATE bookings SET 
             nama_peminjam = ?, 
-            no_telepon = ?, 
+           
             tanggal_booking = ?, 
             jam_mulai = ?, 
             jam_selesai = ?, 
@@ -124,7 +196,6 @@ class BookingController extends Controller
             updated_at = NOW() 
             WHERE id = ?', [
                 $request->nama_peminjam,
-                $request->no_telepon,
                 $request->tanggal_booking,
                 $request->jam_mulai,
                 $request->jam_selesai,
@@ -146,15 +217,26 @@ class BookingController extends Controller
     }
 
 
-   public function summary(string $id){
-    $booking = DB::selectOne('
-        SELECT bookings.*, events.*
-        FROM bookings
-        INNER JOIN events ON bookings.id_event = events.id
-        WHERE bookings.id = ?', [$id]);
+    public function summary(string $id) {
+        $booking = DB::selectOne('
+            SELECT bookings.*, events.*
+            FROM bookings
+            LEFT JOIN events ON bookings.id_event = events.id
+            WHERE bookings.id = ? AND bookings.id_event IS NULL
+        ', [$id]);
 
-    // Pass the $booking data to the view
-    return view('event', ['booking' => $booking]);
+        if (!$booking) {
+            $booking = DB::selectOne('
+                SELECT bookings.*, events.*
+                FROM bookings
+                INNER JOIN events ON bookings.id_event = events.id
+                WHERE bookings.id = ?
+            ', [$id]);
+        }
+    
+        // Pass the $booking data to the view
+        return view('event', ['booking' => $booking]);
     }
+    
 
 }

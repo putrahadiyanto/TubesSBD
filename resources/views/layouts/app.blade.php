@@ -53,6 +53,7 @@
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="{{ route('booking') }}">Booking</a></li>
+          <li><a href="/list-booking">List Booking</a></li>
           <li><a href="https://wa.me/6282111342943" target = "_blank">Kontak Admin</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

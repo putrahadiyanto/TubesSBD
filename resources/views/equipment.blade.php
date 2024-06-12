@@ -37,7 +37,7 @@
                         <select name="equipment_id" id="equipment" class="form-control">
                             <option value="" hidden>Select Equipment</option>
                             @foreach($equipments as $equipment)
-                                <option value="{{ $equipment->id }}" data-price="{{ $equipment->harga  }}">{{ $equipment->nama_equipment }}</option>
+                                <option value="{{ $equipment->id }}" data-price="{{ $equipment->harga }}" data-stok="{{ $equipment->stok }}">{{ $equipment->nama_equipment }}</option>
                             @endforeach
                         </select>                        
                     </div>
@@ -47,7 +47,7 @@
                     </div>
                     <!-- Display total dynamically -->
                     <div class="form-group">
-                        <p>Total: <span id="total"></span></p>
+                        <p>Total: <span id="total">0.00</span></p>
                     </div>
                 </div>
 
@@ -81,11 +81,41 @@
         totalSpan.innerText = total.toFixed(2);
     }
 
-    // Event listener for equipment selection change
-    document.getElementById('equipment').addEventListener('change', calculateTotal);
+    // Function to update the max quantity based on selected equipment's stock
+    function updateQuantityMax() {
+        var equipmentSelect = document.getElementById('equipment');
+        var quantityInput = document.getElementById('quantity');
 
-    // Event listener for quantity input change
-    document.getElementById('quantity').addEventListener('input', calculateTotal);
+        var selectedOption = equipmentSelect.options[equipmentSelect.selectedIndex];
+        var stok = parseInt(selectedOption.getAttribute('data-stok'));
+
+        quantityInput.max = stok;
+        if (quantityInput.value > stok) {
+            quantityInput.value = stok;
+        }
+
+        calculateTotal();
+    }
+
+    // Event listener for equipment selection change
+    document.getElementById('equipment').addEventListener('change', updateQuantityMax);
+
+    // Event listener for quantity input change to enforce max limit
+    document.getElementById('quantity').addEventListener('input', function() {
+        var max = parseInt(this.max);
+        if (parseInt(this.value) > max) {
+            this.value = max;
+        }
+        if (parseInt(this.value) < 1) {
+            this.value = 1;
+        }
+        calculateTotal();
+    });
+
+    // Initial call to set the max value when the page loads
+    if (document.getElementById('equipment').selectedIndex !== -1) {
+        updateQuantityMax();
+    }
 </script>
 
 @endsection

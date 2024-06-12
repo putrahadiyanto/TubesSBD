@@ -36,7 +36,7 @@ class BookingController extends Controller
 
             // Check if emailId is not null before accessing its property
             // Pass the email id with the error message
-            return redirect()->route('bookingstore', ['id_peminjam' => $emailId->id_peminjam])->with('error', 'Email not found in our records.');
+            return redirect()->route('bookingstore', ['id_peminjam' => $emailId->id_peminjam]);
         }
     }
  
@@ -138,7 +138,7 @@ class BookingController extends Controller
         $total_price = $request->total_price;
 
         // Call the MySQL function to check for schedule conflicts
-        $conflict_count = DB::select("
+        $schedule_conflict_count = DB::select("
             SELECT checkScheduleConflict(?, ?, ?) AS conflict_count
         ", [
             $tanggal_booking,
@@ -146,11 +146,27 @@ class BookingController extends Controller
             $jam_selesai,
         ]);
 
-        // Check the result of the conflict check
-        if ($conflict_count[0]->conflict_count > 0) {
+        // Check the result of the schedule conflict check
+        if ($schedule_conflict_count[0]->conflict_count > 0) {
             // Conflict found, redirect back to the create booking page with an error message and pass id_peminjam
             return redirect()->route('bookingstore', ['id_peminjam' => $id_peminjam])
-                ->with('error', 'The selected time slot overlaps with a member\'s schedule. Please choose a different time.');
+                ->with('error', 'Waktu yang dipilih sudah diisi oleh member, silakan pilih waktu lain');
+        }
+
+        // Call the MySQL function to check for booking conflicts
+        $booking_conflict_count = DB::select("
+            SELECT checkBookingOverlap(?, ?, ?) AS conflict_count
+        ", [
+            $tanggal_booking,
+            $jam_mulai,
+            $jam_selesai,
+        ]);
+
+        // Check the result of the booking conflict check
+        if ($booking_conflict_count[0]->conflict_count > 0) {
+            // Conflict found, redirect back to the create booking page with an error message and pass id_peminjam
+            return redirect()->route('bookingstore', ['id_peminjam' => $id_peminjam])
+                ->with('error', 'Waktu yang dipilih sudah diisi, silakan pilih waktu lain');
         }
 
         // No conflicts, proceed with booking insertion
@@ -172,6 +188,7 @@ class BookingController extends Controller
         // Redirect to the equipment creation page with the ID of the newly created booking
         return redirect()->route('createEquipment', ['id' => $bookingId])->with('success', 'Booking created successfully.');
     }
+
    
    public function show($id)
    {
@@ -202,8 +219,7 @@ class BookingController extends Controller
     {
 
         DB::update('UPDATE bookings SET 
-            nama_peminjam = ?, 
-           
+            id_peminjam = ?, 
             tanggal_booking = ?, 
             jam_mulai = ?, 
             jam_selesai = ?, 
@@ -212,7 +228,7 @@ class BookingController extends Controller
             status_booking = ?, 
             updated_at = NOW() 
             WHERE id = ?', [
-                $request->nama_peminjam,
+                $request->id_peminjam,
                 $request->tanggal_booking,
                 $request->jam_mulai,
                 $request->jam_selesai,
@@ -236,17 +252,19 @@ class BookingController extends Controller
 
     public function summary(string $id) {
         $booking = DB::selectOne('
-            SELECT bookings.*, events.*
+            SELECT bookings.*, events.*, peminjam.*
             FROM bookings
             LEFT JOIN events ON bookings.id_event = events.id
+            INNER JOIN peminjam ON bookings.id_peminjam = peminjam.id_peminjam
             WHERE bookings.id = ? AND bookings.id_event IS NULL
         ', [$id]);
-
+    
         if (!$booking) {
             $booking = DB::selectOne('
-                SELECT bookings.*, events.*
+                SELECT bookings.*, events.*, peminjam.*
                 FROM bookings
                 INNER JOIN events ON bookings.id_event = events.id
+                INNER JOIN peminjam ON bookings.id_peminjam = peminjam.id_peminjam
                 WHERE bookings.id = ?
             ', [$id]);
         }
@@ -254,6 +272,7 @@ class BookingController extends Controller
         // Pass the $booking data to the view
         return view('event', ['booking' => $booking]);
     }
+    
     
 
 }

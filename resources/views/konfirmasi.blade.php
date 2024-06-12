@@ -38,7 +38,12 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                        <form id="emailForm" method="POST" action="{{ route('cekEmail') }}">
+                            @csrf
+                            <input type="hidden" name="email" value="{{ $Email }}">
+                            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                        </form>
+
                     </form>
                 </div>
             </div>

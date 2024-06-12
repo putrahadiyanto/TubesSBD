@@ -5,6 +5,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\UserController;
 
 
 /*
@@ -21,6 +22,9 @@ use App\Http\Controllers\EventController;
 Route::get('/', function () {
     return view('index');
 })->name('home');
+
+Route::get('/list-booking', [UserController::class, 'insertEmail'])->name('insertEmail');
+Route::post('/cekEmail', [UserController::class, 'cekEmail'])->name('cekEmail');
 
 Route::get('/booking', [BookingController::class, 'enterEmail'])->name('booking');
 Route::post('/booking/email', [BookingController::class, 'processEmail'])->name('email');

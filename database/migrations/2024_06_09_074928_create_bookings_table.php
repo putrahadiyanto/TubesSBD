@@ -3,6 +3,7 @@
     use Illuminate\Database\Migrations\Migration;
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Support\Facades\Schema;
+    use Illuminate\Support\Facades\DB;
 
     return new class extends Migration
     {
@@ -28,6 +29,30 @@
                 $table->foreign('id_event')->references('id')->on('events')->onDelete('set null');
                 $table->foreign('id_peminjam')->references('id_peminjam')->on('peminjam')->onDelete('set null');
             });
+
+            DB::unprepared('
+                CREATE TRIGGER update_booking_event BEFORE INSERT ON bookings
+                FOR EACH ROW
+                BEGIN
+                    DECLARE event_id INT;
+                    DECLARE event_discount DECIMAL(5, 2);
+
+                    -- Fetch the event ID and discount based on the booking date
+                    SELECT id, diskon INTO event_id, event_discount 
+                    FROM events 
+                    WHERE hari_event = DAYNAME(NEW.tanggal_booking) LIMIT 1;
+
+                    -- Check if the event is found for the booking date
+                    IF event_id IS NOT NULL THEN
+                        -- Update the booking ID with the event ID
+                        SET NEW.id_event = event_id;
+
+                        -- Apply discount to the booking total
+                        SET NEW.total = NEW.total - (NEW.total * event_discount / 100);
+                    END IF;
+                END
+            ');
+
         }
 
         /**
@@ -35,6 +60,7 @@
          */
         public function down(): void
         {
+            DB::unprepared('DROP TRIGGER IF EXISTS update_booking_event');
             Schema::dropIfExists('bookings');
         }
     };
